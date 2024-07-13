@@ -6,12 +6,14 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
 import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
+import {useToast} from "@/components/ui/use-toast";
 
 const formSchema = z.object({
   username: z.string().min(2, "Username must be at least 2 characters.").max(50)
 })
 
 export function PlainForm() {
+  const { toast } = useToast()
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -21,6 +23,14 @@ export function PlainForm() {
   })
 
   function onSubmit(values: z.infer<typeof formSchema>) {
+    toast({
+      title: "Plain Form",
+      description: (
+        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
+          <code className="text-white">{JSON.stringify(values, null, 2)}</code>
+        </pre>
+      )
+    })
     console.log(values)
   }
 
