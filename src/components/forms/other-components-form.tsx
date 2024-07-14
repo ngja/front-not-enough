@@ -12,6 +12,9 @@ import {cn} from "@/lib/utils";
 import {format} from "date-fns";
 import {CalendarIcon} from "lucide-react";
 import {Calendar} from "@/components/ui/calendar";
+import {Input} from "@/components/ui/input";
+import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 
 const items = [
   {
@@ -42,6 +45,11 @@ const formSchema = z.object({
     message:  "You have to select at least one item.",
   }),
   date: z.date({required_error: "A date is required."}),
+  text: z.string(),
+  radio: z.enum(["all", "mentions", "none"], {
+    required_error: "You need to select a notificaiton type."
+  }),
+  select: z.string(),
 })
 
 type OtherComponentsFormValues = z.infer<typeof formSchema>
@@ -54,6 +62,8 @@ export function OtherComponentsForm() {
     defaultValues: {
       check: false,
       multiCheck: [],
+      text: "",
+      radio: "all",
     }
   })
 
@@ -63,7 +73,6 @@ export function OtherComponentsForm() {
       description: (
         <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
           <code className="text-white">{JSON.stringify(values, null, 2)}</code>
-          <div className="text-white">{values.date.getTimezoneOffset()}</div>
         </pre>
       )
     })
@@ -160,6 +169,80 @@ export function OtherComponentsForm() {
             </Popover>
             <FormDescription>
               Your date of birth is used to calculate your age.
+            </FormDescription>
+            <FormMessage />
+          </FormItem>
+        )}/>
+        {/* 텍스트 */}
+        <FormField control={form.control} name="text" render={({ field }) => (
+          <FormItem>
+            <FormLabel>Username</FormLabel>
+            <FormControl>
+              <Input placeholder="shadcn" {...field} />
+            </FormControl>
+            <FormDescription>
+              This is your public display name.
+            </FormDescription>
+            <FormMessage />
+          </FormItem>
+        )}/>
+        {/* Radio Group */}
+        <FormField control={form.control} name="radio" render={({ field }) => (
+          <FormItem>
+            <FormLabel>Notify me about...</FormLabel>
+            <FormControl>
+              <RadioGroup
+                onValueChange={field.onChange}
+                defaultValue={field.value}
+                className="flex flex-col space-y-1"
+              >
+                <FormItem className="flex items-center space-x-3 space-y-0">
+                  <FormControl>
+                    <RadioGroupItem value="all" />
+                  </FormControl>
+                  <FormLabel className="font-normal">
+                    All new message
+                  </FormLabel>
+                </FormItem>
+                <FormItem className="flex items-center space-x-3 space-y-0">
+                  <FormControl>
+                    <RadioGroupItem value="mentions" />
+                  </FormControl>
+                  <FormLabel className="font-normal">
+                    Direct messages and mentions
+                  </FormLabel>
+                </FormItem>
+                <FormItem className="flex items-center space-x-3 space-y-0">
+                  <FormControl>
+                    <RadioGroupItem value="none" />
+                  </FormControl>
+                  <FormLabel className="font-normal">
+                    Nothing
+                  </FormLabel>
+                </FormItem>
+              </RadioGroup>
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}/>
+        {/* Select */}
+        <FormField control={form.control} name="select" render={({ field }) => (
+          <FormItem>
+            <FormLabel>Email</FormLabel>
+            <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <FormControl>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a verified email to display" />
+                </SelectTrigger>
+              </FormControl>
+              <SelectContent>
+                <SelectItem value="a@example.com">a@example.com</SelectItem>
+                <SelectItem value="b@google.com">b@google.com</SelectItem>
+                <SelectItem value="c@kakao.com">c@kakao.com</SelectItem>
+              </SelectContent>
+            </Select>
+            <FormDescription>
+              You can manage email addresses in your
             </FormDescription>
             <FormMessage />
           </FormItem>
