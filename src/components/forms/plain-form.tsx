@@ -31,7 +31,6 @@ export function PlainForm() {
         </pre>
       )
     })
-    console.log(values)
   }
 
   return (
