@@ -15,6 +15,7 @@ import {Calendar} from "@/components/ui/calendar";
 import {Input} from "@/components/ui/input";
 import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
+import {Switch} from "@/components/ui/switch";
 
 const items = [
   {
@@ -50,6 +51,7 @@ const formSchema = z.object({
     required_error: "You need to select a notificaiton type."
   }),
   select: z.string(),
+  switchButton: z.boolean(),
 })
 
 type OtherComponentsFormValues = z.infer<typeof formSchema>
@@ -64,7 +66,8 @@ export function OtherComponentsForm() {
       multiCheck: [],
       text: "",
       radio: "all",
-    }
+    },
+    switchButton: false,
   })
 
   function onSubmit(values: OtherComponentsFormValues) {
@@ -245,6 +248,23 @@ export function OtherComponentsForm() {
               You can manage email addresses in your
             </FormDescription>
             <FormMessage />
+          </FormItem>
+        )}/>
+        {/* Switch */}
+        <FormField control={form.control} name="switchButton" render={({ field }) => (
+          <FormItem>
+            <FormLabel>
+              Marketing emails
+            </FormLabel>
+            <FormDescription>
+              Receive emails about new products, features, and more.
+            </FormDescription>
+            <FormControl>
+              <Switch
+                checked={field.value}
+                onCheckedChange={field.onChange}
+              />
+            </FormControl>
           </FormItem>
         )}/>
         <Button type="submit">Submit</Button>
