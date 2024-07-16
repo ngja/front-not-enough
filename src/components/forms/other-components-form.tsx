@@ -10,12 +10,14 @@ import {Checkbox} from "@/components/ui/checkbox";
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
 import {cn} from "@/lib/utils";
 import {format} from "date-fns";
-import {CalendarIcon} from "lucide-react";
+import {CalendarIcon, Check, ChevronsUpDown} from "lucide-react";
 import {Calendar} from "@/components/ui/calendar";
 import {Input} from "@/components/ui/input";
 import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {Switch} from "@/components/ui/switch";
+import {Textarea} from "@/components/ui/textarea";
+import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from "@/components/ui/command";
 
 const items = [
   {
@@ -40,6 +42,18 @@ const items = [
   },
 ] as const
 
+const languages = [
+  { label: "English", value: "en" },
+  { label: "French", value: "fr" },
+  { label: "German", value: "de" },
+  { label: "Spanish", value: "es" },
+  { label: "Portuguese", value: "pt" },
+  { label: "Russian", value: "ru" },
+  { label: "Japanese", value: "ja" },
+  { label: "Korean", value: "ko" },
+  { label: "Chinese", value: "zh" },
+] as const
+
 const formSchema = z.object({
   check: z.boolean(),
   multiCheck: z.array(z.string()).refine((value) => value.some((item) => item), {
@@ -52,6 +66,8 @@ const formSchema = z.object({
   }),
   select: z.string(),
   switchButton: z.boolean(),
+  textarea: z.string(),
+  combo: z.string(),
 })
 
 type OtherComponentsFormValues = z.infer<typeof formSchema>
@@ -66,8 +82,8 @@ export function OtherComponentsForm() {
       multiCheck: [],
       text: "",
       radio: "all",
+      switchButton: false,
     },
-    switchButton: false,
   })
 
   function onSubmit(values: OtherComponentsFormValues) {
@@ -252,19 +268,81 @@ export function OtherComponentsForm() {
         )}/>
         {/* Switch */}
         <FormField control={form.control} name="switchButton" render={({ field }) => (
-          <FormItem>
-            <FormLabel>
-              Marketing emails
-            </FormLabel>
-            <FormDescription>
-              Receive emails about new products, features, and more.
-            </FormDescription>
+          <FormItem className="flex flex-row items-center justify-between border p-4">
+            <div className="space-y-0.5">
+              <FormLabel className="text-base">
+                Marketing emails
+              </FormLabel>
+              <FormDescription>
+                Receive emails about new products, features, and more.
+              </FormDescription>
+            </div>
             <FormControl>
               <Switch
                 checked={field.value}
                 onCheckedChange={field.onChange}
               />
             </FormControl>
+          </FormItem>
+        )}/>
+        {/* Textarea */}
+        <FormField control={form.control} name="textarea" render={({ field }) => (
+          <FormItem>
+            <FormLabel>Bio</FormLabel>
+            <FormControl>
+              <Textarea
+                placeholder="Tell us a little bit about yourself"
+                className="resize-none"
+                {...field}
+              />
+            </FormControl>
+            <FormDescription>
+              You can @mention other users and organizations.
+            </FormDescription>
+          </FormItem>
+        )}/>
+        {/* Combobox */}
+        <FormField control={form.control} name="combo" render={({ field }) => (
+          <FormItem className="flex flex-col">
+            <FormLabel>Language</FormLabel>
+            <Popover>
+              <PopoverTrigger asChild>
+                <FormControl>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    className={cn("w-[200px] justify-between", !field.value && "text-muted-foreground")}
+                  >
+                    {field.value ? languages.find((language) => language.value === field.value)?.label : "Select language"}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </FormControl>
+              </PopoverTrigger>
+              <PopoverContent className="w-[200px] p-0">
+                <Command>
+                  <CommandInput placeholder="Search language..." />
+                  <CommandList>
+                    <CommandEmpty>No language found.</CommandEmpty>
+                    <CommandGroup>
+                      {languages.map((language) => (
+                        <CommandItem
+                          value={language.label}
+                          key={language.value}
+                          onSelect={() => {
+                            form.setValue("combo", language.value)
+                          }}
+                        >
+                          <Check className={cn("mr-2 h-4 w-4", language.value === field.value ? "opacity-100" : "opacity-0")}/>
+                          {language.label}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
+            <FormDescription>This is the language that will be used in the dashboard.</FormDescription>
+            <FormMessage />
           </FormItem>
         )}/>
         <Button type="submit">Submit</Button>
